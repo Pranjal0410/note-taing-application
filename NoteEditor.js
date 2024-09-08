@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import styled from "styled-components";
+import { FaBold, FaItalic, FaHeading, FaSave, FaEraser } from "react-icons/fa";
 
 const EditorContainer = styled.div`
   background-color: #1e1e1e;
@@ -13,25 +14,25 @@ const EditorContainer = styled.div`
 
 const Toolbar = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   margin-bottom: 10px;
+`;
 
-  button {
-    margin: 0 5px;
-    padding: 10px;
-    background-color: #454545;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    
-    &:hover {
-      background-color: #6e6e6e;
-    }
+const IconButton = styled.button`
+  background-color: #454545;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  color: white;
+  cursor: pointer;
+  margin-right: 5px;
 
-    &.active {
-      background-color: #d4a5a5;
-    }
+  &:hover {
+    background-color: #6e6e6e;
+  }
+
+  &.active {
+    background-color: #d4a5a5;
   }
 `;
 
@@ -44,47 +45,74 @@ const ContentArea = styled.div`
   font-size: 1rem;
 `;
 
-export const NoteEditor = () => {
+const ActionButtons = styled.div`
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-between;
+`;
+
+export const NoteEditor = ({ onSave }) => {
   const editor = useEditor({
     extensions: [StarterKit],
     content: '<p>Start taking notes...</p>',
   });
+  const [noteContent, setNoteContent] = useState('');
 
   if (!editor) {
     return null;
   }
 
+  const handleSave = () => {
+    const content = editor.getHTML();
+    onSave(content);
+    editor.commands.clearContent();
+  };
+
+  const handleClear = () => {
+    editor.commands.clearContent();
+  };
+
   return (
     <EditorContainer>
       <Toolbar>
-        <button
+        <IconButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           className={editor.isActive("bold") ? "active" : ""}
         >
-          Bold
-        </button>
-        <button
+          <FaBold />
+        </IconButton>
+        <IconButton
           onClick={() => editor.chain().focus().toggleItalic().run()}
           className={editor.isActive("italic") ? "active" : ""}
         >
-          Italic
-        </button>
-        <button
+          <FaItalic />
+        </IconButton>
+        <IconButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
           className={editor.isActive("heading", { level: 1 }) ? "active" : ""}
         >
-          H1
-        </button>
-        <button
+          <FaHeading /> H1
+        </IconButton>
+        <IconButton
           onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
           className={editor.isActive("heading", { level: 2 }) ? "active" : ""}
         >
-          H2
-        </button>
+          <FaHeading /> H2
+        </IconButton>
       </Toolbar>
+
       <ContentArea>
         <EditorContent editor={editor} />
       </ContentArea>
+
+      <ActionButtons>
+        <IconButton onClick={handleSave}>
+          <FaSave /> Save Note
+        </IconButton>
+        <IconButton onClick={handleClear}>
+          <FaEraser /> Clear
+        </IconButton>
+      </ActionButtons>
     </EditorContainer>
   );
 };
