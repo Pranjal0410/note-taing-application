@@ -1,2 +1,2 @@
-# note-taing-application
+# note-taking-application
 react
